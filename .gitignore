@@ -1,0 +1,10 @@
+# 本地运行产物
+proxy_log.txt
+.feiq-uploads/
+edgeprof*/
+# 原程序（太大且非本项目代码）
+FeiQ.exe
+# 系统杂项
+.claude/
+Thumbs.db
+instrument-rd-workbench.html
