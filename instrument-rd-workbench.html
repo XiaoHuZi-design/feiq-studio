@@ -1,0 +1,1848 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#2C1058" />
+<title>紫罗兰工作台 · 智能设备研发</title>
+<style>
+  :root{
+    --bg:#F5F2FB;
+    --surface:#FFFFFF;
+    --surface-2:#FBF9FF;
+    --line:#E9E2F7;
+    --line-soft:#F2ECFB;
+    --ink:#241A38;
+    --ink-2:#4C3F66;
+    --muted:#8B7FA5;
+    --violet:#7C3AED;
+    --violet-600:#6D28D9;
+    --violet-dark:#4C1D95;
+    --violet-soft:#EFE8FC;
+    --violet-line:#D8C9F6;
+    --rose:#C2417F;
+    --rose-soft:#FBEAF3;
+    --green:#0F9D76;
+    --green-soft:#E4F7F0;
+    --amber:#B4791A;
+    --amber-soft:#FCF2DF;
+    --blue:#2563EB;
+    --blue-soft:#EAF1FE;
+    --teal:#0F766E;
+    --teal-soft:#E6F7F5;
+    --grad:linear-gradient(135deg,#7C3AED 0%,#A855F7 55%,#D8B4FE 100%);
+    --rail-w:254px;
+    --r-lg:22px;
+    --r-md:16px;
+    --r-sm:11px;
+    --shadow:0 18px 40px -28px rgba(76,29,149,.55);
+    --shadow-sm:0 2px 10px -6px rgba(76,29,149,.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"PingFang SC","HarmonyOS Sans SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+    background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+  ::selection{background:#DDD0FB;color:#3B1178}
+  .app{display:flex;min-height:100vh}
+
+  /* 侧栏 */
+  .rail{
+    width:var(--rail-w);flex:0 0 var(--rail-w);
+    background:radial-gradient(120% 80% at 20% 0%,#4B1C93 0%,#33115F 45%,#260C49 100%);
+    color:#EDE6FB;padding:26px 18px 20px;
+    display:flex;flex-direction:column;gap:20px;
+    position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;
+  }
+  .rail::after{
+    content:"";position:absolute;right:-70px;top:-60px;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle,rgba(196,132,252,.45),transparent 65%);filter:blur(6px);pointer-events:none;
+  }
+  .brand{display:flex;align-items:center;gap:11px;position:relative;z-index:1}
+  .brand-mark{
+    width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
+    background:var(--grad);color:#fff;font-weight:800;font-size:16px;letter-spacing:.5px;
+    box-shadow:0 8px 20px -10px rgba(216,180,254,.9);
+  }
+  .brand-text{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+  .brand-text strong{font-size:14px;font-weight:600;letter-spacing:.2px;white-space:nowrap}
+  .brand-text span{font-size:9.5px;letter-spacing:1.8px;text-transform:uppercase;color:#B69BE8}
+
+  .nav{display:flex;flex-direction:column;gap:3px;position:relative;z-index:1}
+  .nav-label{font-size:10.5px;letter-spacing:2px;color:#8E71C4;margin:0 0 6px 10px;text-transform:uppercase}
+  .nav-label:not(:first-child){margin-top:7px}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:12px;
+    color:#CDBBEF;font-size:13px;text-align:left;width:100%;transition:background .18s,color .18s;
+  }
+  .nav-item svg{width:16px;height:16px;flex:0 0 16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .nav-item:hover{background:rgba(255,255,255,.07);color:#EFE6FF}
+  .nav-item.is-active{background:rgba(255,255,255,.13);color:#fff;box-shadow:inset 0 0 0 1px rgba(216,180,254,.22)}
+  .nav-item .count{
+    margin-left:auto;font-size:10.5px;padding:1px 6px;border-radius:999px;
+    background:rgba(255,255,255,.12);color:#E6D8FF;min-width:18px;text-align:center;
+  }
+  .nav-item.is-active .count{background:#C4A2FA;color:#31105F;font-weight:600}
+
+  .rail-foot{margin-top:auto;position:relative;z-index:1}
+  .mini-okr{
+    border-radius:16px;padding:12px 14px 13px;
+    background:linear-gradient(160deg,rgba(255,255,255,.1),rgba(255,255,255,.03));
+    border:1px solid rgba(216,180,254,.18);
+  }
+  .mini-okr p{font-size:10px;letter-spacing:1.4px;color:#A98FD8;margin-bottom:8px;text-transform:uppercase}
+  .mini-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+  .mini-row span{font-size:11px;color:#DCCDFA;width:42px;flex:0 0 42px;overflow:hidden;white-space:nowrap}
+  .mini-row .track{flex:1;height:4px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}
+  .mini-row .track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#C4A2FA,#F0E4FF)}
+  .mini-row em{font-style:normal;font-size:10.5px;color:#F0E4FF;font-variant-numeric:tabular-nums;width:30px;text-align:right}
+  .rail-tools{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .rail-tool{
+    font-size:10.5px;padding:7px 9px;border-radius:9px;
+    color:#CDBBEF;border:1px solid rgba(216,180,254,.18);background:rgba(255,255,255,.04);
+    transition:all .16s;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;
+  }
+  .rail-tool:hover{background:rgba(255,255,255,.11);color:#F0E4FF}
+  .rail-tool.danger,.rail-tool.text{border:none;background:none;padding:4px 2px;color:#8E71C4}
+  .rail-tool.text:hover{color:#DCCDFA;background:none}
+  .rail-tool.danger{color:#B0708F}
+  .rail-tool.danger:hover{color:#FFD9EC}
+
+  /* 主区 */
+  .main{
+    flex:1;min-width:0;padding:28px 32px 44px;
+    background:
+      radial-gradient(900px 420px at 8% -12%,#EDE3FF 0%,rgba(237,227,255,0) 70%),
+      radial-gradient(700px 380px at 100% 0%,#F3E9FF 0%,rgba(243,233,255,0) 60%),
+      var(--bg);
+  }
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px;flex-wrap:wrap}
+  .greet-hi{font-size:12.5px;letter-spacing:2.5px;color:var(--violet-600);font-weight:600}
+  .greet h1{font-size:24px;font-weight:650;letter-spacing:-.2px;margin-top:6px;color:#2A1B45}
+  .greet h1 em{font-style:normal;color:var(--violet)}
+  .greet-date{font-size:12.5px;color:var(--muted);margin-top:7px;letter-spacing:.4px}
+  .ring-card{
+    display:flex;align-items:center;gap:14px;padding:12px 18px 12px 12px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);
+  }
+  .ring{position:relative;width:62px;height:62px;flex:0 0 62px}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .track{stroke:#EDE5FA}
+  .ring .bar{stroke:url(#ringGrad);stroke-linecap:round;transition:stroke-dashoffset .5s cubic-bezier(.4,0,.2,1)}
+  .ring-num{position:absolute;inset:0;display:grid;place-items:center;font-size:13.5px;font-weight:700;color:var(--violet-dark);letter-spacing:-.4px}
+  .ring-meta{display:flex;flex-direction:column;gap:2px}
+  .ring-meta b{font-size:13px;font-weight:600;color:#2A1B45}
+  .ring-meta span{font-size:11.5px;color:var(--muted)}
+
+  .view{display:none;animation:rise .3s ease both}
+  .view.is-active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .grid-2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start}
+  .col{display:flex;flex-direction:column;gap:20px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px 11px}
+  .card-head h2{font-size:15px;font-weight:650;letter-spacing:.2px;display:flex;align-items:center;gap:8px}
+  .card-head h2::before{content:"";width:5px;height:15px;border-radius:3px;background:var(--grad)}
+  .card-sub{font-size:11.5px;color:var(--muted);padding:0 20px 13px;margin-top:-5px}
+  .card-body{padding:0 20px 20px}
+
+  .chip{font-size:10.5px;padding:2px 8px;border-radius:999px;letter-spacing:.3px;background:var(--violet-soft);color:var(--violet-600);white-space:nowrap;display:inline-block}
+  .chip.hw{background:var(--blue-soft);color:var(--blue)}
+  .chip.mech{background:var(--amber-soft);color:var(--amber)}
+  .chip.sw{background:var(--violet-soft);color:var(--violet-600)}
+  .chip.fw{background:var(--teal-soft);color:var(--teal)}
+  .chip.opt{background:#FDF0FA;color:#A63A8C}
+  .chip.test{background:var(--green-soft);color:var(--green)}
+  .chip.rev{background:#F0EDF7;color:#6B5C87}
+  .chip.ok{background:var(--green-soft);color:var(--green)}
+  .chip.warn{background:var(--amber-soft);color:var(--amber)}
+  .chip.bad{background:var(--rose-soft);color:var(--rose)}
+
+  .btn{
+    padding:9px 15px;border-radius:11px;background:var(--violet-600);color:#fff;font-size:12.5px;
+    font-weight:600;letter-spacing:.3px;white-space:nowrap;transition:transform .14s,box-shadow .18s,background .18s;
+    box-shadow:0 8px 18px -12px rgba(109,40,217,.9);
+  }
+  .btn:hover{background:#5B21B6;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn.ghost{background:var(--violet-soft);color:var(--violet-600);box-shadow:none}
+  .btn.ghost:hover{background:#E6DBFB}
+  .btn.line{background:#fff;color:var(--violet-600);border:1px solid var(--violet-line);box-shadow:none}
+  .btn.line:hover{background:var(--violet-soft)}
+  .btn.sm{padding:6px 12px;font-size:11.5px;border-radius:9px}
+
+  .add-row{display:flex;gap:9px;flex-wrap:wrap}
+  .add-row input[type=text]{
+    flex:1;min-width:130px;padding:9px 12px;border-radius:11px;border:1px solid var(--line);
+    background:var(--surface-2);font-size:12.5px;outline:none;transition:all .18s;
+  }
+  .add-row input::placeholder,.field input::placeholder,.field textarea::placeholder{color:#B3A7C7}
+  .add-row input:focus{border-color:#C4A2FA;background:#fff;box-shadow:0 0 0 4px #F5EEFF}
+  .sel{
+    padding:0 10px;border-radius:11px;border:1px solid var(--line);background:var(--surface-2);
+    font-size:12.5px;outline:none;height:36px;color:var(--ink-2);
+  }
+  .sel:focus{border-color:#C4A2FA;background:#fff}
+
+  /* 任务 */
+  .task{display:flex;align-items:center;gap:11px;padding:10px 8px;border-radius:12px;transition:background .16s}
+  .task:hover{background:var(--surface-2)}
+  .task + .task{border-top:1px solid var(--line-soft)}
+  .check{
+    width:20px;height:20px;flex:0 0 20px;border-radius:7px;border:1.6px solid var(--violet-line);
+    background:#fff;position:relative;transition:all .18s;
+  }
+  .check:hover{border-color:#A78BFA;box-shadow:0 0 0 4px #F3ECFF}
+  .task.done .check{background:var(--grad);border-color:transparent}
+  .task.done .check::after{
+    content:"";position:absolute;left:5.5px;top:2.5px;width:6px;height:10px;
+    border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(42deg);border-radius:1px;
+  }
+  .task-text{flex:1;min-width:0;font-size:13px;color:var(--ink-2);transition:all .18s}
+  .task.done .task-text{color:#B6ABC9;text-decoration:line-through;text-decoration-color:#D8C9F6}
+  .hrs{font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .del{width:23px;height:23px;border-radius:8px;display:grid;place-items:center;color:#C4B7D8;opacity:0;transition:all .16s;font-size:15px;line-height:1}
+  .task:hover .del,.kr:hover .del,.wkr:hover .del,.proj:hover .del{opacity:1}
+  .del:hover{background:var(--rose-soft);color:var(--rose)}
+  .obj:hover > .obj-head > .del{opacity:1}
+  .ro-task:hover .del{opacity:1}
+
+  .empty{text-align:center;padding:28px 16px;color:#AEA1C4;font-size:12.5px;border:1px dashed var(--line);border-radius:var(--r-md)}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat-grid.four{grid-template-columns:repeat(4,1fr);gap:8px}
+  .stat-grid.four .stat{padding:10px 12px}
+  .stat-grid.four .stat b{font-size:17px}
+  .stat{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:14px;padding:12px 14px}
+  .stat b{display:block;font-size:19px;font-weight:700;color:var(--violet-dark);letter-spacing:-.5px;font-variant-numeric:tabular-nums;line-height:1.3}
+  .stat span{font-size:10.5px;color:var(--muted);letter-spacing:.2px}
+  .stat.accent{background:linear-gradient(150deg,#F6EEFF,#FDFAFF);border-color:var(--violet-line)}
+
+  .hint{display:flex;gap:9px;align-items:flex-start;margin-top:16px;font-size:11.5px;line-height:1.7;color:#8B7FA5;background:#FAF7FF;border:1px solid var(--line-soft);border-radius:12px;padding:11px 13px}
+  .hint b{color:var(--violet-600);font-weight:600}
+
+  /* 样机看板 */
+  .proj{border:1px solid var(--line);border-radius:var(--r-md);padding:15px 16px 13px;background:var(--surface-2)}
+  .proj + .proj{margin-top:13px}
+  .proj-head{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .proj-head b{flex:1;font-size:13.5px;font-weight:600;color:#2A1B45;line-height:1.4}
+  .stepper{display:flex;align-items:center;margin-bottom:14px}
+  .step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:0 0 auto;background:none;padding:0}
+  .step i{
+    width:22px;height:22px;border-radius:50%;border:1.6px solid var(--violet-line);background:#fff;
+    display:grid;place-items:center;font-size:9.5px;font-weight:700;color:#B3A7C7;font-style:normal;transition:all .2s;
+  }
+  .step span{font-size:9.5px;color:#B3A7C7;letter-spacing:.3px}
+  .step.past i{background:var(--violet-soft);border-color:var(--violet-line);color:var(--violet-600)}
+  .step.now i{background:var(--grad);border-color:transparent;color:#fff;box-shadow:0 4px 12px -6px rgba(124,58,237,.9)}
+  .step.now span{color:var(--violet-600);font-weight:600}
+  .step.past span{color:#8B7FA5}
+  .step-line{flex:1;height:1.5px;background:var(--line);margin:0 4px;margin-bottom:16px}
+  .step-line.past{background:var(--violet-line)}
+  .proj-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+  .proj-meta .bar{flex:1;min-width:80px}
+  .due-input{
+    border:1px solid var(--line);border-radius:8px;font-size:10.5px;padding:0 5px;height:23px;
+    background:#fff;color:var(--ink-2);outline:none;flex:0 0 auto;
+  }
+  .due-input:hover{border-color:var(--violet-line)}
+  .due-input:focus{border-color:#C4A2FA;box-shadow:0 0 0 3px #F5EEFF}
+
+  .bar{height:6px;border-radius:99px;background:#F1EAFB;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:99px;background:var(--grad);transition:width .35s}
+  .bar i.low{background:linear-gradient(90deg,#F59E0B,#FBBF24)}
+  .bar i.hit{background:linear-gradient(90deg,#0F9D76,#34D399)}
+
+  /* 月 OKR */
+  .obj{border:1px solid var(--line);border-radius:var(--r-md);padding:15px 16px;background:var(--surface-2)}
+  .obj + .obj{margin-top:13px}
+  .obj-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+  .obj-tag{font-size:10px;font-weight:700;letter-spacing:1px;color:#fff;background:var(--violet);padding:2px 7px;border-radius:6px;margin-top:2px;flex:0 0 auto}
+  .obj-title{flex:1;font-size:13.5px;font-weight:600;color:#2A1B45;line-height:1.5}
+  .obj-prog{font-size:12px;font-weight:700;color:var(--violet-600);font-variant-numeric:tabular-nums}
+  .kr{padding:10px 0;display:flex;gap:12px;align-items:flex-start}
+  .kr + .kr{border-top:1px dashed var(--line)}
+  .kr-main{flex:1;min-width:0}
+  .kr-title{font-size:12.5px;color:var(--ink-2);line-height:1.55}
+  .kr-line{display:flex;align-items:center;gap:10px;margin-top:7px}
+  .kr-num{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .kr-num b{color:var(--violet-dark);font-weight:650}
+  .kr-val{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+  .kr-val input{
+    width:54px;padding:4px 7px;border-radius:8px;border:1px solid var(--line);background:#fff;
+    font-size:12px;text-align:right;outline:none;font-variant-numeric:tabular-nums;
+  }
+  .kr-val input:focus{border-color:#C4A2FA;box-shadow:0 0 0 3px #F5EEFF}
+
+  /* 周 OKR */
+  .week-nav{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-2)}
+  .week-nav button{width:25px;height:25px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--violet-600);display:grid;place-items:center;font-size:13px;line-height:1}
+  .week-nav button:hover{background:var(--violet-soft)}
+  .wkr{padding:12px 6px;display:flex;gap:12px;align-items:flex-start;border-radius:12px;transition:background .16s}
+  .wkr:hover{background:var(--surface-2)}
+  .wkr + .wkr{border-top:1px solid var(--line-soft)}
+  .wkr-main{flex:1;min-width:0}
+  .wkr-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .wkr-top b{font-size:13px;font-weight:550;color:var(--ink-2);line-height:1.5}
+  .wkr.ach .wkr-top b{color:#8E80A8;text-decoration:line-through;text-decoration-color:#D8C9F6}
+  .wkr-ctrl{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .wkr-ctrl input[type=range]{flex:1;max-width:250px;accent-color:var(--violet);height:18px}
+  .pct{font-size:11.5px;color:var(--violet-600);font-weight:650;font-variant-numeric:tabular-nums;width:36px;text-align:right}
+
+  /* 晨会 */
+  .standup-date{font-size:11.5px;color:var(--muted)}
+  .sec-title{font-size:11.5px;font-weight:650;color:var(--violet-dark);letter-spacing:.4px;margin:0 0 9px;display:flex;align-items:center;gap:7px}
+  .sec-title::before{content:"";width:4px;height:11px;border-radius:2px;background:var(--violet-line)}
+  .sec + .sec{margin-top:18px;padding-top:16px;border-top:1px solid var(--line-soft)}
+  .ro-task{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:12.5px;color:var(--ink-2)}
+  .ro-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex:0 0 6px}
+  .ro-dot.miss{background:#D9CDF0}
+  .miss-row{display:flex;gap:9px;align-items:center;padding:6px 0;flex-wrap:wrap}
+  .miss-row .mt{font-size:12.5px;color:var(--ink-2);flex:1;min-width:120px}
+  .miss-row input{
+    flex:1;min-width:130px;padding:6px 10px;border-radius:9px;border:1px solid var(--line);
+    background:var(--surface-2);font-size:11.5px;outline:none;
+  }
+  .miss-row input:focus{border-color:#C4A2FA;background:#fff;box-shadow:0 0 0 3px #F5EEFF}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field label{font-size:10.5px;color:var(--muted);letter-spacing:.5px;padding-left:2px}
+  .field input,.field select,.field textarea{
+    padding:9px 12px;border-radius:11px;border:1px solid var(--line);background:var(--surface-2);
+    outline:none;font-size:12.5px;transition:all .18s;width:100%;
+  }
+  .field textarea{resize:vertical;min-height:58px;line-height:1.65}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:#C4A2FA;background:#fff;box-shadow:0 0 0 4px #F5EEFF}
+  .form-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  /* 历史回顾 */
+  .cal{display:grid;grid-template-columns:repeat(7,38px);gap:5px;justify-content:start}
+  .cal .wd{font-size:9.5px;color:var(--muted);text-align:center;padding-bottom:2px;letter-spacing:.3px}
+  .cal .cell{
+    width:38px;height:38px;border-radius:9px;border:1px solid var(--line-soft);background:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    font-size:11px;color:#9C8FB4;transition:all .15s;
+  }
+  .cal .cell.has{border-color:var(--violet-line);color:#3B1178;font-weight:600}
+  .cal .cell:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+  .cal .cell.today{box-shadow:0 0 0 1.5px var(--violet) inset}
+  .cal .cell i{width:20px;height:2.5px;border-radius:2px;background:rgba(124,58,237,.16);overflow:hidden}
+  .cal .cell i em{display:block;height:100%;background:var(--violet)}
+  .cal .blank{visibility:hidden}
+  .cal-wrap{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+  .cal-wrap > div{flex:1 1 auto;min-width:0}
+  .cal-legend{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--muted);margin-top:10px}
+  .cal-legend i{width:14px;height:14px;border-radius:4px;display:block;border:1px solid var(--line-soft)}
+
+  .his{display:flex;align-items:center;gap:12px;padding:10px 6px;border-radius:10px;cursor:pointer;transition:background .15s}
+  .his:hover{background:var(--surface-2)}
+  .his + .his{border-top:1px solid var(--line-soft)}
+  .his-date{font-size:12px;color:var(--ink-2);width:92px;flex:0 0 92px;font-variant-numeric:tabular-nums}
+  .his-date span{color:var(--muted);font-size:10.5px;margin-left:5px}
+  .his .bar{flex:1;min-width:60px}
+  .his-num{font-size:11px;color:var(--muted);width:82px;text-align:right;font-variant-numeric:tabular-nums;flex:0 0 82px}
+
+  .rail-store{font-size:10px;color:#8E71C4;padding:6px 2px 0;letter-spacing:.3px;cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;grid-column:1/-1}
+  .rail-store:hover{color:#B69BE8}
+
+  /* 流程指引 */
+  .flow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+  .flow span{
+    font-size:11px;padding:5px 11px;border-radius:999px;background:#fff;
+    border:1px solid var(--line);color:var(--muted);cursor:pointer;transition:all .15s;
+  }
+  .flow span:hover{border-color:var(--violet-line);color:var(--violet-600)}
+  .flow span.on{background:var(--violet-soft);border-color:var(--violet-line);color:var(--violet-600);font-weight:600}
+  .flow i{font-style:normal;color:var(--violet-line);font-size:11px}
+
+  .toast{
+    position:fixed;left:50%;bottom:32px;transform:translate(-50%,14px);
+    background:#2C1058;color:#F1E8FF;font-size:12.5px;padding:9px 18px;border-radius:99px;
+    opacity:0;pointer-events:none;transition:all .24s;z-index:99;box-shadow:0 14px 34px -16px rgba(44,16,88,.9);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .tabbar{display:none}
+
+  @media (max-width:1080px){
+    .grid-2{grid-template-columns:1fr}
+    .form-2{grid-template-columns:1fr}
+  }
+  @media (max-width:900px){
+    .app{flex-direction:column}
+    .rail{display:none}
+    .main{padding:20px 16px calc(92px + env(safe-area-inset-bottom))}
+    .topbar{flex-direction:column;gap:14px}
+    .greet h1{font-size:19.5px}
+    .ring-card{align-self:flex-start}
+    .tabbar{
+      display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;
+      background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);
+      padding:7px 2px calc(7px + env(safe-area-inset-bottom));
+    }
+    .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;color:#A497BA;padding:6px 0;border-radius:10px}
+    .tabbar svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+    .tabbar button.is-active{color:var(--violet);background:var(--violet-soft)}
+    .cal{grid-template-columns:repeat(7,1fr);width:100%}
+    .cal .cell{width:auto;height:42px}
+    .cal .cell i{width:70%}
+    .stat-grid.four{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-mark">V</div>
+      <div class="brand-text"><strong>仪器研发工作台</strong><span>violet · r&amp;d</span></div>
+    </div>
+
+    <nav class="nav">
+      <p class="nav-label">① 项目 · 定节点</p>
+      <button class="nav-item" data-view="proj">
+        <svg viewBox="0 0 24 24"><path d="M12 3.5 4 8v8l8 4.5 8-4.5V8Z"/><path d="M4 8l8 4.5L20 8M12 12.5V20"/></svg>
+        <span>样机进度</span><span class="count" id="c-proj">0</span>
+      </button>
+      <p class="nav-label">② 目标 · 月拆周</p>
+      <button class="nav-item" data-view="month">
+        <svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-6M22 19H2"/></svg>
+        <span>每月 OKR</span><span class="count" id="c-month">0%</span>
+      </button>
+      <button class="nav-item" data-view="week">
+        <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 14h3M14 14h2M8 17.5h8"/></svg>
+        <span>每周 OKR</span><span class="count" id="c-week">0</span>
+      </button>
+      <p class="nav-label">③ 执行 · 日与晨会</p>
+      <button class="nav-item is-active" data-view="today">
+        <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/><path d="M8.5 15.5l2 2 3.5-4"/></svg>
+        <span>每日计划</span><span class="count" id="c-today">0</span>
+      </button>
+      <button class="nav-item" data-view="standup">
+        <svg viewBox="0 0 24 24"><path d="M4 6.5h16v9a2 2 0 0 1-2 2H9l-4 3v-3H6a2 2 0 0 1-2-2Z"/><path d="M8.5 11h7M8.5 8h4"/></svg>
+        <span>晨会复盘</span><span class="count" id="c-standup">—</span>
+      </button>
+      <p class="nav-label">④ 回顾</p>
+      <button class="nav-item" data-view="history">
+        <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M7.5 13.5h1M11.5 13.5h1M15.5 13.5h1M7.5 17h1M11.5 17h1"/></svg>
+        <span>历史回顾</span><span class="count" id="c-history">—</span>
+      </button>
+      <button class="nav-item" data-view="review">
+        <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v4h-4"/><path d="M8.5 12.5l2.4 2.4 4.6-4.9"/></svg>
+        <span>月度复盘</span><span class="count" id="c-review">—</span>
+      </button>
+    </nav>
+
+    <div class="rail-foot">
+      <div class="mini-okr">
+        <p>本月 OKR</p>
+        <div id="miniOkr"></div>
+      </div>
+      <div class="rail-tools">
+        <button class="rail-tool" id="backupJson">⤓ 导出备份</button>
+        <button class="rail-tool" id="importJson">⤒ 导入备份</button>
+        <button class="rail-tool text" id="restoreSample">↺ 恢复示例数据</button>
+        <button class="rail-tool danger" id="clearAll">🗑 清空 · 从零开始</button>
+        <input type="file" id="importFile" accept=".json,application/json" style="display:none" />
+        <div class="rail-store" id="storeInfo" title="">数据存于浏览器本地</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="greet">
+        <p class="greet-hi" id="greeting">晚上好</p>
+        <h1 id="pageTitle">把今天的<em>验证</em>跑完</h1>
+        <p class="greet-date" id="dateLine"></p>
+      </div>
+      <div class="ring-card">
+        <div class="ring">
+          <svg width="62" height="62" viewBox="0 0 62 62">
+            <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#D8B4FE"/>
+            </linearGradient></defs>
+            <circle class="track" cx="31" cy="31" r="25" fill="none" stroke-width="6"/>
+            <circle class="bar" id="ringBar" cx="31" cy="31" r="25" fill="none" stroke-width="6"
+                    stroke-dasharray="157.1" stroke-dashoffset="157.1"/>
+          </svg>
+          <div class="ring-num" id="ringNum">0%</div>
+        </div>
+        <div class="ring-meta"><b>今日完成</b><span id="ringTxt">0 / 0 项</span></div>
+      </div>
+    </header>
+
+    <div class="views">
+      <!-- ========== 每日计划 ========== -->
+      <section class="view is-active" id="view-today">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h2>每日工作</h2>
+              <div class="week-nav">
+                <button id="prevDay" aria-label="前一天">‹</button>
+                <input type="date" id="dayPick" class="sel" style="width:138px;height:26px;font-size:11.5px;padding:0 6px" />
+                <button id="nextDay" aria-label="后一天">›</button>
+              </div>
+            </div>
+            <p class="card-sub"><span class="chip" id="dayBadge">今天</span> <span id="dayLabel"></span> · 可回看任意历史日期</p>
+            <div class="card-body">
+              <div id="todayList"></div>
+              <div class="add-row" style="margin-top:14px">
+                <input type="text" id="taskInput" placeholder="今天要推进或验证的一件事" maxlength="80" />
+                <select class="sel" id="taskTag">
+                  <option>硬件电路</option><option>结构</option><option>软件</option>
+                  <option>固件</option><option>光学</option><option>测试</option>
+                  <option>评审</option><option>采购</option>
+                </select>
+                <input type="text" id="taskHours" class="sel" style="width:70px;text-align:center" placeholder="工时h" maxlength="4" />
+                <button class="btn" id="addTask">添加</button>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+                <button class="btn line sm" id="todayBtn">回到今天</button>
+                <button class="btn ghost sm" id="clearDone">清理已完成</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card">
+              <div class="card-head"><h2>今日概况</h2></div>
+              <div class="card-body" style="margin-top:-6px"><div class="stat-grid" id="todayStats"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-head">
+                <h2>前一天遗留</h2>
+                <button class="btn ghost sm" id="carryAll">全部搬到这天</button>
+              </div>
+              <div class="card-body" style="margin-top:-4px"><div id="carryList"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h2>在研样机</h2><span class="chip" id="projBadge">—</span></div>
+              <div class="card-body" style="margin-top:-4px" id="todayProj"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 晨会复盘 ========== -->
+      <section class="view" id="view-standup">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h2>晨会准备</h2>
+              <div class="week-nav">
+                <button id="prevSd" aria-label="前一天">‹</button>
+                <input type="date" id="sdPick" class="sel" style="width:138px;height:26px;font-size:11.5px;padding:0 6px" />
+                <button id="nextSd" aria-label="后一天">›</button>
+              </div>
+            </div>
+            <p class="card-sub"><span id="standupDate"></span> · 研发晨会只讲三件事：昨天出了什么结果、卡在哪、今天动什么。</p>
+            <div class="card-body">
+              <div class="sec">
+                <p class="sec-title">昨天完成 / 有结论的</p>
+                <div id="sDone"></div>
+              </div>
+              <div class="sec">
+                <p class="sec-title">昨天没完成 · 卡在哪</p>
+                <div id="sMiss"></div>
+              </div>
+              <div class="sec">
+                <p class="sec-title">今天要推进的重点</p>
+                <textarea id="sToday" style="width:100%;padding:10px 12px;border-radius:11px;border:1px solid var(--line);background:var(--surface-2);font-size:12.5px;outline:none;min-height:62px;resize:vertical" placeholder="1–3 件，最好带可验证的结果"></textarea>
+              </div>
+              <div class="sec form-2">
+                <div class="field"><label>阻塞 / 需要谁配合</label><textarea id="sBlock" placeholder="等物料 / 等打样 / 等测试台 / 等供应商回复"></textarea></div>
+                <div class="field"><label>风险提示</label><textarea id="sRisk" placeholder="可能影响节点、认证、试产的问题"></textarea></div>
+              </div>
+              <div class="sec" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+                <span style="font-size:11.5px;color:var(--muted);line-height:1.7;flex:1;min-width:170px">打字自动保存。复制出来可直接粘进晨会群。</span>
+                <div style="display:flex;gap:8px">
+                  <button class="btn line sm" id="copyStandup">复制晨会稿</button>
+                  <button class="btn sm" id="saveStandup">保存</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card">
+              <div class="card-head"><h2>昨日数据</h2></div>
+              <div class="card-body" style="margin-top:-6px"><div class="stat-grid" id="standupStats"></div></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h2>晨会稿预览</h2></div>
+              <div class="card-body" style="margin-top:-4px">
+                <pre id="standupPreview" style="white-space:pre-wrap;font-family:inherit;font-size:11.5px;line-height:1.8;color:#5D4E78;background:var(--surface-2);border:1px solid var(--line-soft);border-radius:12px;padding:12px 13px;margin:0;max-height:330px;overflow:auto"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 每周 OKR ========== -->
+      <section class="view" id="view-week">
+        <div class="card">
+          <div class="card-head">
+            <h2>本周关键结果</h2>
+            <div class="week-nav">
+              <button id="prevWeek">‹</button>
+              <span id="weekLabel"></span>
+              <button id="nextWeek">›</button>
+            </div>
+          </div>
+          <p class="card-sub">周 KR 从月 KR 拆下来，每条都挂上游，周会就不容易开成进度汇报流水账。</p>
+          <div class="card-body">
+            <div class="add-row" style="margin-bottom:16px">
+              <input type="text" id="wkrInput" placeholder="这周要产出什么可验收的结果（点亮？跑通？通过？）" maxlength="90" />
+              <select class="sel" id="wkrLink"></select>
+              <button class="btn" id="addWkr">加入本周</button>
+            </div>
+            <div id="weekList"></div>
+            <div id="weekSummary" style="margin-top:16px"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 每月 OKR ========== -->
+      <section class="view" id="view-month">
+        <div class="card">
+          <div class="card-head">
+            <h2>每月 OKR</h2>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <div class="week-nav">
+                <button id="prevMonth" aria-label="上个月">‹</button>
+                <span id="monthLabel"></span>
+                <button id="nextMonth" aria-label="下个月">›</button>
+              </div>
+              <span class="chip" id="monthBadge">0%</span>
+            </div>
+          </div>
+          <p class="card-sub">KR 落到可测量的指标上：分辨率、精度、纹波、余量、通过率，别写「优化」「提升」。</p>
+          <div class="card-body">
+            <div id="objList"></div>
+            <div class="add-row" style="margin-top:16px">
+              <input type="text" id="objInput" placeholder="新增 Objective，例如：完成 XS-200 的 DVT 样机交付" maxlength="80" />
+              <button class="btn ghost" id="addObj">新增 O</button>
+            </div>
+
+            <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line-soft)">
+              <p class="sec-title">新增关键结果</p>
+              <div class="add-row">
+                <select class="sel" id="krObj"></select>
+                <input type="text" id="krInput" placeholder="KR 描述" maxlength="80" />
+                <input type="text" id="krTarget" class="sel" style="width:74px;text-align:center" placeholder="目标值" maxlength="6" />
+                <input type="text" id="krCur" class="sel" style="width:74px;text-align:center" placeholder="当前值" maxlength="6" />
+                <input type="text" id="krUnit" class="sel" style="width:62px;text-align:center" placeholder="单位" maxlength="4" />
+                <select class="sel" id="krDir"><option value="up">越高越好</option><option value="down">越低越好</option></select>
+                <button class="btn" id="addKr">添加 KR</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 样机进度 ========== -->
+      <section class="view" id="view-proj">
+        <div class="flow">
+          <span class="on" data-jump="proj">① 定项目与节点</span><i>→</i>
+          <span data-jump="month">② 拆本月 OKR</span><i>→</i>
+          <span data-jump="week">③ 拆本周 KR</span><i>→</i>
+          <span data-jump="today">④ 每日执行</span><i>→</i>
+          <span data-jump="standup">⑤ 晨会 · 复盘</span>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h2>样机 / 项目进度</h2>
+            <span class="chip" id="projSummary">—</span>
+          </div>
+          <p class="card-sub">点阶段圆点可直接切换当前阶段：方案 → EVT → DVT → PVT → 量产。</p>
+          <div class="card-body">
+            <div id="projList"></div>
+            <div class="add-row" style="margin-top:18px">
+              <input type="text" id="projName" placeholder="项目 / 样机名称，例如：XS-200 荧光显微成像系统" maxlength="60" />
+              <select class="sel" id="projStage">
+                <option>方案</option><option>EVT</option><option>DVT</option><option>PVT</option><option>量产</option>
+              </select>
+              <input type="date" id="projDue" class="sel" style="width:150px" />
+              <select class="sel" id="projRisk"><option>低</option><option>中</option><option>高</option></select>
+              <button class="btn" id="addProj">新增项目</button>
+            </div>
+            <div class="hint">
+              <span>⚑</span>
+              <div>阶段含义：<b>EVT</b> 工程验证（功能能不能实现）→ <b>DVT</b> 设计验证（设计是否完整可靠）→ <b>PVT</b> 生产验证（产线能不能稳定做出来）→ <b>量产</b>。节点日期用于倒排，逾期会自动标红。</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 历史回顾 ========== -->
+      <section class="view" id="view-history">
+        <div class="card">
+          <div class="card-head">
+            <h2>历史回顾</h2>
+            <div class="week-nav">
+              <button id="prevHm" aria-label="上个月">‹</button>
+              <span id="historyLabel"></span>
+              <button id="nextHm" aria-label="下个月">›</button>
+            </div>
+          </div>
+          <p class="card-sub">颜色越深 = 当天完成率越高。点任意一天，直接跳到那天的任务明细（可补记）。</p>
+          <div class="card-body">
+            <div class="stat-grid four" id="historyStats" style="margin-bottom:18px"></div>
+            <div class="cal-wrap">
+              <div>
+                <div class="cal" id="calGrid"></div>
+                <div class="cal-legend">
+                  <span>少</span>
+                  <i style="background:#fff"></i>
+                  <i style="background:rgba(124,58,237,.14)"></i>
+                  <i style="background:rgba(124,58,237,.29)"></i>
+                  <i style="background:rgba(124,58,237,.44)"></i>
+                  <i style="background:rgba(124,58,237,.6)"></i>
+                  <span>多</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:22px">
+              <p class="sec-title">当月每日记录</p>
+              <div id="historyList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 月度复盘 ========== -->
+      <section class="view" id="view-review">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h2>月度复盘</h2>
+              <select class="sel" id="reviewMonth"></select>
+            </div>
+            <p class="card-sub">月底最后一天填。数据自动统计，你只写判断和下一步动作。</p>
+            <div class="card-body">
+              <div class="stat-grid" id="reviewStats" style="margin-bottom:16px"></div>
+              <div class="field" style="margin-bottom:11px"><label>这个月做对了什么</label><textarea id="rvHigh" placeholder="哪个决策、哪个验证提前发现了问题？"></textarea></div>
+              <div class="field" style="margin-bottom:11px"><label>问题与根因</label><textarea id="rvLow" placeholder="不是「延期了」，而是「为什么延期、哪个环节没兜住」"></textarea></div>
+              <div class="field" style="margin-bottom:11px"><label>下月改进动作</label><textarea id="rvAction" placeholder="具体到能落地的动作，不超过 3 条"></textarea></div>
+              <div class="field" style="margin-bottom:13px"><label>下月聚焦</label><textarea id="rvFocus" placeholder="一句话：下个月最重要的一件事"></textarea></div>
+              <div style="display:flex;justify-content:flex-end;gap:8px">
+                <button class="btn line sm" id="exportMd">导出 Markdown</button>
+                <button class="btn sm" id="saveReview">保存复盘</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card">
+              <div class="card-head"><h2>该月 OKR 快照</h2></div>
+              <div class="card-body" style="margin-top:-4px" id="reviewOkr"></div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h2>样机阶段快照</h2></div>
+              <div class="card-body" style="margin-top:-4px" id="reviewProj"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar">
+  <button data-view="proj"><svg viewBox="0 0 24 24"><path d="M12 3.5 4 8v8l8 4.5 8-4.5V8Z"/><path d="M4 8l8 4.5L20 8"/></svg><span>样机</span></button>
+  <button data-view="month"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-6M22 19H2"/></svg><span>月</span></button>
+  <button data-view="week"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 14h3M14 14h2"/></svg><span>周</span></button>
+  <button class="is-active" data-view="today"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg><span>今日</span></button>
+  <button data-view="standup"><svg viewBox="0 0 24 24"><path d="M4 6.5h16v9a2 2 0 0 1-2 2H9l-4 3v-3H6a2 2 0 0 1-2-2Z"/></svg><span>晨会</span></button>
+  <button data-view="history"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M7.5 14h1M11.5 14h1M15.5 14h1"/></svg><span>历史</span></button>
+  <button data-view="review"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20.5 3.5v4h-4"/></svg><span>复盘</span></button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+  const KEY = "instrument-rd-workbench.v1";
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.prototype.slice.call((r || document).querySelectorAll(s));
+  const uid = () => Math.random().toString(36).slice(2, 9);
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const dstr = (d) => d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  const today = () => new Date();
+  const addDays = (d, n) => { const x = new Date(d.getTime()); x.setDate(x.getDate() + n); return x; };
+  const T_KEY = () => dstr(today());
+  const Y_KEY = () => dstr(addDays(today(), -1));
+  const M_KEY = (d) => { d = d || today(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1); };
+  const STAGES = ["方案", "EVT", "DVT", "PVT", "量产"];
+
+  function mondayOf(d) {
+    const x = new Date(d.getTime());
+    const wd = (x.getDay() + 6) % 7;
+    x.setDate(x.getDate() - wd);
+    x.setHours(0, 0, 0, 0);
+    return x;
+  }
+  function isoWeek(d) {
+    const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const day = x.getUTCDay() || 7;
+    x.setUTCDate(x.getUTCDate() + 4 - day);
+    const y0 = new Date(Date.UTC(x.getUTCFullYear(), 0, 1));
+    return Math.ceil(((x - y0) / 86400000 + 1) / 7);
+  }
+  const W_KEY = (d) => dstr(mondayOf(d || today()));
+  function weekLabel(k) {
+    const m = new Date(k + "T00:00:00"), e = addDays(m, 6);
+    return "第 " + isoWeek(m) + " 周 · " + (m.getMonth() + 1) + "/" + m.getDate() + " – " + (e.getMonth() + 1) + "/" + e.getDate();
+  }
+  function daysLeft(dueStr, refKey) {
+    if (!dueStr) return null;
+    const due = new Date(dueStr + "T00:00:00");
+    const ref = refKey
+      ? new Date(refKey + "T00:00:00")
+      : new Date(today().getFullYear(), today().getMonth(), today().getDate());
+    return Math.round((due - ref) / 86400000);
+  }
+
+  /* ---------------- 默认数据（显微仪器研发场景） ---------------- */
+  function buildDefaults() {
+    const t = T_KEY(), y = Y_KEY();
+    const d = {
+      objectives: [
+        { id: "o1", title: "完成 XS-200 荧光显微成像系统 DVT 样机交付", krs: [
+          { id: "k1", title: "整机成像分辨率达到 0.25 μm，完成 3 组标样实测", target: 3, current: 2, unit: "组", dir: "up" },
+          { id: "k2", title: "主控电路板 V2.3 改版打样并点亮，电源纹波 < 20 mV", target: 100, current: 80, unit: "%", dir: "up" },
+          { id: "k3", title: "运动平台重复定位精度 ≤ 2 μm", target: 2, current: 3.5, unit: "μm", dir: "down" },
+          { id: "k4", title: "上位机软件架构重构，采集卡驱动与业务层解耦", target: 100, current: 55, unit: "%", dir: "up" },
+          { id: "k5", title: "整机 EMC 预测试通过，辐射骚扰余量 ≥ 3 dB", target: 100, current: 20, unit: "%", dir: "up" }
+        ]},
+        { id: "o2", title: "样机可靠性与可制造性达到试产要求", krs: [
+          { id: "k6", title: "整机连续 72 小时稳定性运行无宕机", target: 72, current: 48, unit: "h", dir: "up" },
+          { id: "k7", title: "关键长周期物料国产替代验证完成 5 项", target: 5, current: 3, unit: "项", dir: "up" },
+          { id: "k8", title: "装配工艺文件与 BOM 冻结", target: 100, current: 70, unit: "%", dir: "up" }
+        ]}
+      ],
+      projects: [
+        { id: "p1", name: "XS-200 荧光显微成像系统", stage: "DVT", progress: 62, due: dstr(addDays(today(), 42)), risk: "中",
+          note: "光栅尺交期是最大变量" },
+        { id: "p2", name: "XS-100 便携式金相显微镜", stage: "EVT", progress: 35, due: dstr(addDays(today(), 88)), risk: "低", note: "结构手板第二轮" },
+        { id: "p3", name: "自动扫描平台 V3 主控板", stage: "PVT", progress: 84, due: dstr(addDays(today(), 16)), risk: "高",
+          note: "EMC 辐射骚扰余量不足 2 dB" }
+      ],
+      weeks: {},
+      days: {},
+      standups: {},
+      reviews: {}
+    };
+    d.weeks[W_KEY()] = [
+      { id: uid(), text: "V2.3 板卡上电点亮，电源树关键节点纹波实测 < 20 mV", krId: "k2", pct: 70 },
+      { id: uid(), text: "采集卡驱动接口层重构完成，单元测试覆盖 60%", krId: "k4", pct: 45 },
+      { id: uid(), text: "运动平台重复定位精度复测，输出误差分布报告", krId: "k3", pct: 35 },
+      { id: uid(), text: "整机 72 小时稳定性测试跑完第二轮", krId: "k6", pct: 100 }
+    ];
+    d.days[t] = [
+      { id: uid(), text: "V2.3 板卡上电时序核对 + 各路电源纹波实测", tag: "硬件电路", hours: 3, done: true },
+      { id: uid(), text: "采集卡驱动抽离厂商 SDK，重构接口层", tag: "软件", hours: 4, done: false },
+      { id: uid(), text: "运动平台重复定位精度复测（激光干涉仪）", tag: "测试", hours: 2.5, done: false },
+      { id: uid(), text: "和供应商确认光栅尺交期与替代方案", tag: "采购", hours: 0.5, done: false }
+    ];
+    d.days[y] = [
+      { id: uid(), text: "V2.3 板卡回板目检 + 关键网络阻抗测试", tag: "硬件电路", hours: 3, done: true },
+      { id: uid(), text: "图像采集链路联调，定位丢帧原因（DMA 缓冲区）", tag: "软件", hours: 4, done: true },
+      { id: uid(), text: "结构件二次打样件干涉检查", tag: "结构", hours: 2, done: true },
+      { id: uid(), text: "EMC 预测试暗室排期确认", tag: "测试", hours: 1, done: false }
+    ];
+    d.standups[y] = {
+      reasons: {},
+      today: "跑通采集链路长稳测试，同时把驱动接口层重构推完",
+      block: "光栅尺供应商交期 4 周，等对方确认是否可分批发货",
+      risk: "EMC 暗室排期未定，若排到月底会挤压 DVT 节点"
+    };
+    return {
+      okrByMonth: (function () { const m = {}; m[M_KEY()] = d.objectives; return m; })(),
+      projects: d.projects,
+      weeks: d.weeks,
+      days: d.days,
+      standups: d.standups,
+      reviews: d.reviews
+    };
+  }
+
+  let state = load();
+  function load() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { saved = null; }
+    if (!saved || typeof saved !== "object") return buildDefaults();
+    const base = buildDefaults();
+
+    // OKR 按月存档：兼容旧版单份 objectives
+    let okr = saved.okrByMonth && typeof saved.okrByMonth === "object" ? saved.okrByMonth : null;
+    if (!okr) {
+      okr = {};
+      if (Array.isArray(saved.objectives)) okr[M_KEY()] = saved.objectives;
+      else return buildDefaults();
+    }
+
+    return {
+      okrByMonth: okr,
+      projects: Array.isArray(saved.projects) ? saved.projects : base.projects,
+      weeks: saved.weeks && typeof saved.weeks === "object" ? saved.weeks : base.weeks,
+      days: saved.days && typeof saved.days === "object" ? saved.days : base.days,
+      standups: saved.standups && typeof saved.standups === "object" ? saved.standups : base.standups,
+      reviews: saved.reviews && typeof saved.reviews === "object" ? saved.reviews : {}
+    };
+  }
+  /* 视图内部游标：可回看任意历史日期 / 月份 */
+  let viewDay = T_KEY();
+  let viewStandupDay = Y_KEY();
+  let viewMonth = M_KEY();
+  let historyMonth = M_KEY();
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); renderStoreInfo(); }
+    catch (e) { toast("保存失败，可能是隐私模式或存储已满"); }
+  }
+
+  let toastTimer = null;
+  function toast(msg) {
+    const t = $("#toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
+  }
+
+  /* ---------------- 计算 ---------------- */
+  function krProgress(kr) {
+    const t = Number(kr.target) || 0, c = Number(kr.current);
+    if (!isFinite(c)) return 0;
+    if (kr.dir === "down") {
+      if (c <= t) return 100;
+      if (c <= 0) return 100;
+      return Math.max(0, Math.min(100, Math.round((t / c) * 100)));
+    }
+    if (t <= 0) return 0;
+    return Math.max(0, Math.min(100, Math.round((c / t) * 100)));
+  }
+  function okrList(ym) { return (state.okrByMonth && state.okrByMonth[ym]) || []; }
+  function okrEdit(ym) { if (!state.okrByMonth[ym]) state.okrByMonth[ym] = []; return state.okrByMonth[ym]; }
+  function allKrs(ym) { return okrList(ym).reduce((a, o) => a.concat(o.krs || []), []); }
+  function monthProgress(ym) {
+    const krs = allKrs(ym || viewMonth);
+    if (!krs.length) return 0;
+    return Math.round(krs.reduce((s, k) => s + krProgress(k), 0) / krs.length);
+  }
+  function findKr(id) {
+    const months = Object.keys(state.okrByMonth || {});
+    for (const ym of months) {
+      for (const o of state.okrByMonth[ym]) {
+        const k = (o.krs || []).find((x) => x.id === id);
+        if (k) return { o: o, kr: k, ym: ym };
+      }
+    }
+    return null;
+  }
+  function taskList(k) { return state.days[k] || []; }
+  function dayStats(k) {
+    const ts = taskList(k);
+    const total = ts.length, done = ts.filter((t) => t.done).length;
+    const hours = ts.reduce((s, t) => s + (Number(t.hours) || 0), 0);
+    const doneHours = ts.filter((t) => t.done).reduce((s, t) => s + (Number(t.hours) || 0), 0);
+    return { total, done, hours, doneHours, rate: total ? Math.round((done / total) * 100) : 0 };
+  }
+  function monthStats(ym) {
+    let total = 0, done = 0, hours = 0;
+    Object.keys(state.days).filter((k) => k.indexOf(ym) === 0).forEach((k) => {
+      state.days[k].forEach((t) => { total++; hours += Number(t.hours) || 0; if (t.done) done++; });
+    });
+    const wItems = Object.keys(state.weeks).filter((k) => k.indexOf(ym) === 0).reduce((a, k) => a.concat(state.weeks[k] || []), []);
+    const wDone = wItems.filter((i) => (i.pct || 0) >= 100).length;
+    return {
+      total, done, hours,
+      rate: total ? Math.round((done / total) * 100) : 0,
+      days: Object.keys(state.days).filter((k) => k.indexOf(ym) === 0).length,
+      wTotal: wItems.length, wDone,
+      wRate: wItems.length ? Math.round((wDone / wItems.length) * 100) : 0,
+      okr: monthProgress(ym)
+    };
+  }
+  function projRiskCls(r) { return r === "高" ? "bad" : r === "中" ? "warn" : "ok"; }
+
+  /* ---------------- 渲染 ---------------- */
+  function renderRing() {
+    const s = dayStats(T_KEY());
+    $("#ringNum").textContent = s.rate + "%";
+    $("#ringTxt").textContent = s.done + " / " + s.total + " 项";
+    const C = 2 * Math.PI * 25;
+    $("#ringBar").setAttribute("stroke-dashoffset", String(C * (1 - s.rate / 100)));
+  }
+  function renderMiniOkr() {
+    const list = okrList(M_KEY());
+    $("#miniOkr").innerHTML = list.length
+      ? list.map((o, i) => {
+          const p = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + krProgress(k), 0) / o.krs.length) : 0;
+          return '<div class="mini-row"><span>O' + (i + 1) + '</span><div class="track"><i style="width:' + p + '%"></i></div><em>' + p + '%</em></div>';
+        }).join("")
+      : '<p style="font-size:11px;color:#B69BE8;margin:0">还没有 Objective</p>';
+  }
+  function renderHead() {
+    const d = today(), h = d.getHours();
+    $("#greeting").textContent = h < 6 ? "还没睡啊" : h < 11 ? "早上好" : h < 14 ? "中午好" : h < 18 ? "下午好" : "晚上好";
+    const wd = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"][d.getDay()];
+    $("#dateLine").textContent = d.getFullYear() + " 年 " + (d.getMonth() + 1) + " 月 " + d.getDate() + " 日 · " + wd + " · " + weekLabel(W_KEY());
+  }
+
+  const tagMap = { "硬件电路": "hw", "结构": "mech", "软件": "sw", "固件": "fw", "光学": "opt", "测试": "test", "评审": "rev", "采购": "rev" };
+  const tagCls = (t) => tagMap[t] || "";
+
+  const WD = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+  function dayDiff(k) {
+    const a = new Date(k + "T00:00:00"), b = new Date(T_KEY() + "T00:00:00");
+    return Math.round((a - b) / 86400000);
+  }
+  function relDay(k) {
+    const dd = dayDiff(k);
+    if (dd === 0) return "今天";
+    if (dd === -1) return "昨天";
+    if (dd === 1) return "明天";
+    return dd < 0 ? Math.abs(dd) + " 天前" : dd + " 天后";
+  }
+  const prevOf = (k) => dstr(addDays(new Date(k + "T00:00:00"), -1));
+
+  function renderToday() {
+    const k = viewDay;
+    const ts = taskList(k);
+    const isToday = k === T_KEY();
+    $("#todayList").innerHTML = ts.length
+      ? ts.map((t) => `
+        <div class="task ${t.done ? "done" : ""}" data-id="${t.id}">
+          <button class="check" data-act="toggle" aria-label="完成"></button>
+          <span class="task-text">${esc(t.text)}</span>
+          <span class="chip ${tagCls(t.tag)}">${esc(t.tag)}</span>
+          ${t.hours ? '<span class="hrs">' + esc(t.hours) + 'h</span>' : ""}
+          <button class="del" data-act="del" aria-label="删除">×</button>
+        </div>`).join("")
+      : '<div class="empty">' + (isToday ? "今天还没安排。先写下要验证的那一件事。" : "这天没有工作记录。") + '</div>';
+
+    const s = dayStats(k);
+    const mOKR = monthProgress(M_KEY(new Date(k + "T00:00:00")));
+    $("#todayStats").innerHTML = `
+      <div class="stat accent"><b>${s.rate}%</b><span>完成率</span></div>
+      <div class="stat"><b>${s.done}/${s.total}</b><span>已完成 / 总数</span></div>
+      <div class="stat"><b>${s.doneHours}/${s.hours}</b><span>已完成工时</span></div>
+      <div class="stat"><b>${mOKR}%</b><span>当月 OKR 进度</span></div>`;
+
+    const d = new Date(k + "T00:00:00");
+    $("#dayLabel").textContent = d.getFullYear() + " 年 " + (d.getMonth() + 1) + " 月 " + d.getDate() + " 日 · " + WD[d.getDay()];
+    const badge = $("#dayBadge");
+    badge.textContent = relDay(k);
+    badge.className = "chip" + (isToday ? "" : dayDiff(k) < 0 ? " rev" : " warn");
+    $("#dayPick").value = k;
+    $("#todayBtn").style.display = isToday ? "none" : "inline-flex";
+    $("#taskInput").placeholder = isToday ? "今天要推进或验证的一件事" : "补记这一天做的事";
+
+    $("#c-today").textContent = taskList(T_KEY()).filter((t) => !t.done).length;
+    renderRing();
+  }
+
+  function renderCarry() {
+    const prev = prevOf(viewDay);
+    const miss = taskList(prev).filter((t) => !t.done);
+    const pd = new Date(prev + "T00:00:00");
+    $("#carryList").innerHTML = miss.length
+      ? '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">来自 ' + (pd.getMonth() + 1) + "/" + pd.getDate() + " 未完成</div>" +
+        miss.map((t) => `<div class="ro-task"><span class="ro-dot miss"></span><span style="flex:1">${esc(t.text)}</span><span class="chip ${tagCls(t.tag)}">${esc(t.tag)}</span><button class="del" data-delid="${t.id}" aria-label="删除">×</button></div>`).join("")
+      : '<div class="empty" style="padding:20px 12px">前一天没有遗留</div>';
+  }
+
+  function renderTodayProj() {
+    const active = state.projects.filter((p) => p.stage !== "量产");
+    $("#projBadge").textContent = active.length + " 个在研";
+    $("#todayProj").innerHTML = active.length
+      ? active.map((p) => {
+          const isToday = viewDay === T_KEY();
+          const dl = daysLeft(p.due, viewDay);
+          const dlTxt = dl === null
+            ? "未设节点"
+            : dl < 0
+              ? "已超期 " + Math.abs(dl) + " 天"
+              : isToday ? "距节点 " + dl + " 天" : "截至 " + shortD(viewDay) + " 剩 " + dl + " 天";
+          return `<div style="padding:9px 0;border-bottom:1px solid var(--line-soft)">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="chip">${esc(p.stage)}</span>
+              <span style="flex:1;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name)}</span>
+              <span class="chip ${projRiskCls(p.risk)}">${esc(p.risk)}</span>
+            </div>
+            <div class="bar" style="margin-top:7px"><i class="${p.progress >= 100 ? "hit" : p.progress < 40 ? "low" : ""}" style="width:${p.progress}%"></i></div>
+            <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:5px">
+              <span>${p.progress}%</span>
+              <span style="${dl !== null && dl < 0 ? "color:var(--rose)" : ""}">${dlTxt}</span>
+            </div>
+          </div>`;
+        }).join("")
+      : '<div class="empty" style="padding:20px 12px">还没有在研项目<br><button class="btn sm" data-goto="proj" style="margin-top:12px">去「样机进度」新建 →</button></div>';
+  }
+
+  $("#todayProj").addEventListener("click", (e) => {
+    if (e.target.closest("[data-goto=proj]")) setView("proj");
+  });
+
+  $("#todayList").addEventListener("click", (e) => {
+    const act = e.target.closest("[data-act]");
+    if (!act) return;
+    const row = act.closest(".task");
+    const list = state.days[viewDay] || [];
+    const item = list.find((t) => t.id === row.dataset.id);
+    if (!item) return;
+    if (act.dataset.act === "toggle") item.done = !item.done;
+    else list.splice(list.indexOf(item), 1);
+    save(); renderToday(); renderCarry();
+  });
+
+  function addTask() {
+    const input = $("#taskInput"), text = input.value.trim();
+    if (!text) { input.focus(); return; }
+    if (!state.days[viewDay]) state.days[viewDay] = [];
+    state.days[viewDay].push({
+      id: uid(), text, tag: $("#taskTag").value,
+      hours: Number($("#taskHours").value) || 0, done: false
+    });
+    input.value = ""; $("#taskHours").value = "";
+    save(); renderToday();
+  }
+  $("#addTask").addEventListener("click", addTask);
+  $("#taskInput").addEventListener("keydown", (e) => { if (e.key === "Enter") addTask(); });
+  $("#taskHours").addEventListener("keydown", (e) => { if (e.key === "Enter") addTask(); });
+  $("#clearDone").addEventListener("click", () => {
+    const list = state.days[viewDay] || [];
+    const n = list.filter((t) => t.done).length;
+    if (!n) { toast("这天没有已完成的任务"); return; }
+    state.days[viewDay] = list.filter((t) => !t.done);
+    save(); renderToday(); toast("清掉了 " + n + " 条");
+  });
+
+  /* 日期切换 */
+  function gotoDay(k) {
+    viewDay = k;
+    renderToday(); renderCarry(); renderTodayProj();
+  }
+  $("#prevDay").addEventListener("click", () => gotoDay(prevOf(viewDay)));
+  $("#nextDay").addEventListener("click", () => gotoDay(dstr(addDays(new Date(viewDay + "T00:00:00"), 1))));
+  $("#dayPick").addEventListener("change", (e) => { if (e.target.value) gotoDay(e.target.value); });
+  $("#todayBtn").addEventListener("click", () => gotoDay(T_KEY()));
+
+  $("#carryAll").addEventListener("click", () => {
+    const prev = prevOf(viewDay);
+    const miss = taskList(prev).filter((t) => !t.done);
+    if (!miss.length) { toast("没有可搬的任务"); return; }
+    if (!state.days[viewDay]) state.days[viewDay] = [];
+    miss.forEach((t) => {
+      state.days[viewDay].push({ id: uid(), text: t.text, tag: t.tag, hours: t.hours, done: false });
+      t.done = true; t.carried = true;
+    });
+    save(); renderToday(); renderCarry(); toast("已搬 " + miss.length + " 条到 " + relDay(viewDay));
+  });
+
+  function removeTaskAt(dateKey, id) {
+    const list = state.days[dateKey];
+    if (!list) return;
+    const i = list.findIndex((t) => t.id === id);
+    if (i < 0) return;
+    list.splice(i, 1);
+    const sd = state.standups[dateKey];
+    if (sd && sd.reasons) delete sd.reasons[id];
+    save(); renderCarry(); renderToday(); renderStandup();
+    toast("已删除");
+  }
+  $("#carryList").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-delid]");
+    if (b) removeTaskAt(prevOf(viewDay), b.dataset.delid);
+  });
+  ["#sDone", "#sMiss"].forEach((sel) => {
+    $(sel).addEventListener("click", (e) => {
+      const b = e.target.closest("[data-delid]");
+      if (b) removeTaskAt(viewStandupDay, b.dataset.delid);
+    });
+  });
+
+  /* ---------------- 晨会 ---------------- */
+  function standupData(k) {
+    if (!state.standups[k]) state.standups[k] = { reasons: {}, today: "", block: "", risk: "" };
+    return state.standups[k];
+  }
+  function standupText(k) {
+    const d = standupData(k), ts = taskList(k);
+    const done = ts.filter((t) => t.done), miss = ts.filter((t) => !t.done);
+    const md = new Date(k + "T00:00:00");
+    let s = "【" + (md.getMonth() + 1) + "/" + md.getDate() + " 研发晨会】\n";
+    s += "1. 昨日完成：" + (done.length ? done.map((t) => t.text).join("；") : "无") + "\n";
+    s += "2. 未完成：" + (miss.length ? miss.map((t) => t.text + (d.reasons[t.id] ? "（" + d.reasons[t.id] + "）" : "")).join("；") : "无") + "\n";
+    s += "3. 今日重点：" + (d.today || "待补充") + "\n";
+    if (d.block) s += "4. 阻塞/需配合：" + d.block + "\n";
+    if (d.risk) s += "5. 风险：" + d.risk + "\n";
+    return s;
+  }
+  function renderStandup() {
+    const k = viewStandupDay, d = standupData(k);
+    const md = new Date(k + "T00:00:00");
+    $("#standupDate").textContent = (md.getMonth() + 1) + " 月 " + md.getDate() + " 日 " + WD[md.getDay()] + " · " + relDay(k);
+    $("#sdPick").value = k;
+    const ts = taskList(k);
+    const done = ts.filter((t) => t.done), miss = ts.filter((t) => !t.done);
+
+    $("#sDone").innerHTML = done.length
+      ? done.map((t) => `<div class="ro-task"><span class="ro-dot"></span><span style="flex:1">${esc(t.text)}</span><span class="chip ${tagCls(t.tag)}">${esc(t.tag)}</span><button class="del" data-delid="${t.id}" aria-label="删除">×</button></div>`).join("")
+      : '<div class="empty" style="padding:18px 12px">这天没有标记完成的任务</div>';
+
+    $("#sMiss").innerHTML = miss.length
+      ? miss.map((t) => `<div class="miss-row">
+            <span class="ro-dot miss"></span>
+            <span class="mt">${esc(t.text)}</span>
+            <input type="text" data-rid="${t.id}" value="${esc(d.reasons[t.id] || "")}" placeholder="卡在哪（等料/等测试/等回复）" maxlength="46" />
+            <button class="del" data-delid="${t.id}" aria-label="删除">×</button>
+          </div>`).join("")
+      : '<div class="empty" style="padding:18px 12px">这天任务全部完成</div>';
+
+    $("#sToday").value = d.today || "";
+    $("#sBlock").value = d.block || "";
+    $("#sRisk").value = d.risk || "";
+
+    const st = dayStats(k);
+    $("#standupStats").innerHTML = `
+      <div class="stat accent"><b>${st.rate}%</b><span>昨日完成率</span></div>
+      <div class="stat"><b>${st.done}/${st.total}</b><span>完成 / 计划</span></div>
+      <div class="stat"><b>${(st.doneHours).toFixed(1).replace(/\.0$/, "")}h</b><span>实际投入</span></div>
+      <div class="stat"><b>${miss.length}</b><span>待交接项</span></div>`;
+
+    $("#standupPreview").textContent = standupText(k);
+    updateStandupBadge();
+  }
+
+  $("#sMiss").addEventListener("input", (e) => {
+    const inp = e.target.closest("[data-rid]");
+    if (!inp) return;
+    standupData(viewStandupDay).reasons[inp.dataset.rid] = inp.value;
+    save(); $("#standupPreview").textContent = standupText(viewStandupDay);
+  });
+  ["sToday", "sBlock", "sRisk"].forEach((id) => {
+    $("#" + id).addEventListener("input", () => {
+      const d = standupData(viewStandupDay);
+      if (id === "sToday") d.today = $("#" + id).value;
+      if (id === "sBlock") d.block = $("#" + id).value;
+      if (id === "sRisk") d.risk = $("#" + id).value;
+      save(); $("#standupPreview").textContent = standupText(viewStandupDay);
+      updateStandupBadge();
+    });
+  });
+  function updateStandupBadge() {
+    const y = state.standups[Y_KEY()];
+    $("#c-standup").textContent = (y && (y.today || y.block || y.risk)) ? "已填" : "待填";
+  }
+  $("#saveStandup").addEventListener("click", () => { save(); toast("晨会记录已保存"); });
+  $("#copyStandup").addEventListener("click", () => copyText(standupText(viewStandupDay), "晨会稿已复制"));
+
+  function gotoSd(k) { viewStandupDay = k; renderStandup(); }
+  $("#prevSd").addEventListener("click", () => gotoSd(prevOf(viewStandupDay)));
+  $("#nextSd").addEventListener("click", () => gotoSd(dstr(addDays(new Date(viewStandupDay + "T00:00:00"), 1))));
+  $("#sdPick").addEventListener("change", (e) => { if (e.target.value) gotoSd(e.target.value); });
+
+  function copyText(txt, okMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(() => toast(okMsg), () => fallbackCopy(txt, okMsg));
+    } else fallbackCopy(txt, okMsg);
+  }
+  function fallbackCopy(txt, okMsg) {
+    const ta = document.createElement("textarea");
+    ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); toast(okMsg); } catch (e) { toast("复制失败，请手动选中"); }
+    document.body.removeChild(ta);
+  }
+
+  /* ---------------- 周 OKR ---------------- */
+  let viewWeekKey = W_KEY();
+
+  function renderWeek() {
+    $("#weekLabel").textContent = weekLabel(viewWeekKey);
+    const items = state.weeks[viewWeekKey] || [];
+    $("#weekList").innerHTML = items.length
+      ? items.map((i) => {
+          const kr = i.krId ? findKr(i.krId) : null;
+          const ach = (i.pct || 0) >= 100;
+          return `<div class="wkr ${ach ? "ach" : ""}" data-id="${i.id}">
+            <div class="wkr-main">
+              <div class="wkr-top">
+                <b>${esc(i.text)}</b>
+                ${kr ? '<span class="chip">↳ ' + esc(kr.kr.title.slice(0, 16)) + (kr.kr.title.length > 16 ? "…" : "") + '</span>' : '<span class="chip warn">未挂上游</span>'}
+                ${ach ? '<span class="chip ok">达成</span>' : ""}
+              </div>
+              <div class="wkr-ctrl">
+                <input type="range" min="0" max="100" step="5" value="${i.pct || 0}" data-act="range" />
+                <span class="pct">${i.pct || 0}%</span>
+              </div>
+            </div>
+            <button class="del" data-act="del" aria-label="删除">×</button>
+          </div>`;
+        }).join("")
+      : '<div class="empty">这周还没拆 KR。从月 KR 里挑一条，落到具体可验收的产出。</div>';
+    updateWeekSummary();
+  }
+  function updateWeekSummary() {
+    const items = state.weeks[viewWeekKey] || [];
+    const doneCount = items.filter((i) => (i.pct || 0) >= 100).length;
+    const avg = items.length ? Math.round(items.reduce((s, i) => s + (i.pct || 0), 0) / items.length) : 0;
+    $("#weekSummary").innerHTML = `
+      <div class="stat-grid">
+        <div class="stat accent"><b>${avg}%</b><span>本周平均进度</span></div>
+        <div class="stat"><b>${doneCount}/${items.length}</b><span>已达成 KR</span></div>
+      </div>`;
+    $("#c-week").textContent = items.filter((i) => (i.pct || 0) < 100).length;
+  }
+  let countTimer = null;
+  function debouncedSummary() { clearTimeout(countTimer); countTimer = setTimeout(updateWeekSummary, 260); }
+
+  function fillLinkSelects() {
+    const wm = M_KEY(new Date(viewWeekKey + "T00:00:00"));
+    let krs = allKrs(wm);
+    if (!krs.length) krs = allKrs(M_KEY());
+    const html = ['<option value="">不挂上游</option>']
+      .concat(krs.map((k) => '<option value="' + k.id + '">' + esc(k.title.slice(0, 24)) + (k.title.length > 24 ? "…" : "") + '</option>'))
+      .join("");
+    const wl = $("#wkrLink");
+    if (wl) { const v = wl.value; wl.innerHTML = html; wl.value = v; }
+    const ko = $("#krObj");
+    if (ko) {
+      const v = ko.value;
+      ko.innerHTML = okrList(viewMonth).map((o, i) => '<option value="' + o.id + '">O' + (i + 1) + " · " + esc(o.title.slice(0, 18)) + "</option>").join("") || '<option value="">先建一个 O</option>';
+      if (v) ko.value = v;
+    }
+  }
+
+  $("#weekList").addEventListener("click", (e) => {
+    const act = e.target.closest("[data-act]");
+    if (!act) return;
+    const row = act.closest(".wkr");
+    const list = state.weeks[viewWeekKey] || [];
+    const item = list.find((i) => i.id === row.dataset.id);
+    if (!item) return;
+    if (act.dataset.act === "del") { list.splice(list.indexOf(item), 1); save(); renderWeek(); renderMiniOkr(); }
+  });
+  $("#weekList").addEventListener("input", (e) => {
+    const r = e.target.closest("[data-act=range]");
+    if (!r) return;
+    const row = r.closest(".wkr");
+    const item = (state.weeks[viewWeekKey] || []).find((i) => i.id === row.dataset.id);
+    if (!item) return;
+    item.pct = Number(r.value);
+    row.querySelector(".pct").textContent = item.pct + "%";
+    row.classList.toggle("ach", item.pct >= 100);
+    save(); debouncedSummary();
+  });
+  $("#addWkr").addEventListener("click", () => {
+    const input = $("#wkrInput"), text = input.value.trim();
+    if (!text) { input.focus(); return; }
+    if (!state.weeks[viewWeekKey]) state.weeks[viewWeekKey] = [];
+    state.weeks[viewWeekKey].push({ id: uid(), text, krId: $("#wkrLink").value || "", pct: 0 });
+    input.value = "";
+    save(); renderWeek(); renderMiniOkr();
+  });
+  $("#wkrInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#addWkr").click(); });
+  $("#prevWeek").addEventListener("click", () => {
+    viewWeekKey = dstr(addDays(new Date(viewWeekKey + "T00:00:00"), -7)); renderWeek();
+  });
+  $("#nextWeek").addEventListener("click", () => {
+    viewWeekKey = dstr(addDays(new Date(viewWeekKey + "T00:00:00"), 7)); renderWeek();
+  });
+
+  /* ---------------- 月 OKR ---------------- */
+  function monthLabelOf(ym) {
+    const a = ym.split("-");
+    return a[0] + " 年 " + Number(a[1]) + " 月";
+  }
+  function renderMonth() {
+    const list = okrList(viewMonth);
+    const total = monthProgress(viewMonth);
+    $("#monthLabel").textContent = monthLabelOf(viewMonth);
+    $("#monthBadge").textContent = "整体 " + total + "%";
+    $("#c-month").textContent = monthProgress(M_KEY()) + "%";
+
+    $("#objList").innerHTML = list.length
+      ? list.map((o, oi) => {
+          const p = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + krProgress(k), 0) / o.krs.length) : 0;
+          const krs = o.krs.length
+            ? o.krs.map((k) => {
+                const kp = krProgress(k);
+                const cls = kp >= 100 ? "hit" : kp < 40 ? "low" : "";
+                const numTxt = k.dir === "down"
+                  ? "当前 <b>" + esc(k.current) + "</b> / 目标 ≤ " + esc(k.target) + esc(k.unit)
+                  : "当前 <b>" + esc(k.current) + "</b> / 目标 " + esc(k.target) + esc(k.unit);
+                return `<div class="kr" data-kr="${k.id}">
+                  <div class="kr-main">
+                    <div class="kr-title">${esc(k.title)}</div>
+                    <div class="kr-line">
+                      <div class="bar"><i class="${cls}" style="width:${kp}%"></i></div>
+                      <span class="kr-num">${numTxt} · ${kp}%</span>
+                    </div>
+                  </div>
+                  <div class="kr-val">
+                    <input type="text" value="${esc(k.current)}" data-kv="${k.id}" aria-label="当前值" />
+                    <button class="del" data-act="delKr" aria-label="删除">×</button>
+                  </div>
+                </div>`;
+              }).join("")
+            : '<div class="empty" style="padding:14px;margin-top:4px">这个 O 还没有 KR</div>';
+          return `<div class="obj" data-obj="${o.id}">
+            <div class="obj-head">
+              <span class="obj-tag">O${oi + 1}</span>
+              <span class="obj-title">${esc(o.title)}</span>
+              <span class="obj-prog">${p}%</span>
+              <button class="del" data-act="delObj" aria-label="删除 O">×</button>
+            </div>
+            ${krs}
+          </div>`;
+        }).join("")
+      : '<div class="empty">' + monthLabelOf(viewMonth) + ' 还没有 Objective。O 写方向，KR 写可测量的指标；每个月的 OKR 独立存档。</div>';
+
+    fillLinkSelects(); renderMiniOkr();
+  }
+
+  function gotoMonth(ym) { viewMonth = ym; renderMonth(); }
+  function shiftMonth(ym, n) {
+    const a = ym.split("-").map(Number);
+    const d = new Date(a[0], a[1] - 1 + n, 1);
+    return M_KEY(d);
+  }
+  $("#prevMonth").addEventListener("click", () => gotoMonth(shiftMonth(viewMonth, -1)));
+  $("#nextMonth").addEventListener("click", () => gotoMonth(shiftMonth(viewMonth, 1)));
+
+  $("#objList").addEventListener("click", (e) => {
+    const act = e.target.closest("[data-act]");
+    if (!act) return;
+    const krRow = act.closest(".kr"), objRow = act.closest(".obj");
+    const list = okrEdit(viewMonth);
+    if (act.dataset.act === "delKr" && krRow) {
+      const o = list.find((x) => x.id === objRow.dataset.obj);
+      if (!o) return;
+      o.krs = o.krs.filter((x) => x.id !== krRow.dataset.kr);
+      save(); renderMonth(); renderWeek();
+    } else if (act.dataset.act === "delObj" && objRow) {
+      state.okrByMonth[viewMonth] = list.filter((o) => o.id !== objRow.dataset.obj);
+      save(); renderMonth(); renderWeek();
+    }
+  });
+  $("#objList").addEventListener("change", (e) => {
+    const inp = e.target.closest("[data-kv]");
+    if (!inp) return;
+    const found = findKr(inp.dataset.kv);
+    if (!found) return;
+    found.kr.current = Number(inp.value) || 0;
+    save(); renderMonth(); renderWeek();
+  });
+  $("#addObj").addEventListener("click", () => {
+    const input = $("#objInput"), t = input.value.trim();
+    if (!t) { input.focus(); return; }
+    okrEdit(viewMonth).push({ id: uid(), title: t, krs: [] });
+    input.value = ""; save(); renderMonth();
+  });
+  $("#objInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#addObj").click(); });
+  $("#addKr").addEventListener("click", () => {
+    const obj = okrList(viewMonth).find((o) => o.id === $("#krObj").value);
+    const title = $("#krInput").value.trim();
+    if (!obj) { toast("先建一个 Objective"); return; }
+    if (!title) { $("#krInput").focus(); return; }
+    obj.krs.push({
+      id: uid(), title,
+      target: Number($("#krTarget").value) || 0,
+      current: Number($("#krCur").value) || 0,
+      unit: $("#krUnit").value || "%",
+      dir: $("#krDir").value
+    });
+    ["#krInput", "#krTarget", "#krCur", "#krUnit"].forEach((s) => { $(s).value = ""; });
+    save(); renderMonth(); renderWeek();
+  });
+
+  /* ---------------- 样机进度 ---------------- */
+  function renderProj() {
+    const active = state.projects.filter((p) => p.stage !== "量产");
+    $("#projSummary").textContent = state.projects.length + " 个项目 · " + active.length + " 在研";
+    $("#c-proj").textContent = active.length;
+
+    $("#projList").innerHTML = state.projects.length
+      ? state.projects.map((p) => {
+          const idx = STAGES.indexOf(p.stage);
+          const dl = daysLeft(p.due);
+          const steps = STAGES.map((s, i) => {
+            const cls = i < idx ? "past" : i === idx ? "now" : "";
+            return '<button class="step ' + cls + '" data-stage="' + s + '" title="切换到 ' + s + '"><i>' + (i < idx ? "✓" : (i + 1)) + '</i><span>' + s + '</span></button>';
+          });
+          const lines = STAGES.slice(0, -1).map((s, i) => '<div class="step-line ' + (i < idx ? "past" : "") + '"></div>');
+          const stepHTML = steps.reduce((acc, cur, i) => acc + cur + (lines[i] || ""), "");
+          const pcls = p.progress >= 100 ? "hit" : p.progress < 40 ? "low" : "";
+          return `<div class="proj" data-pid="${p.id}">
+            <div class="proj-head">
+              <b>${esc(p.name)}</b>
+              <span class="chip ${projRiskCls(p.risk)}">风险 ${esc(p.risk)}</span>
+              <button class="del" data-act="delProj" aria-label="删除">×</button>
+            </div>
+            <div class="stepper">${stepHTML}</div>
+            <div class="proj-meta">
+              <span style="flex:0 0 auto">节点</span>
+              <input type="date" class="due-input" value="${esc(p.due)}" data-due="${p.id}" title="点击修改节点日期" />
+              <span style="${dl !== null && dl < 0 ? "color:var(--rose);font-weight:600" : ""}">${dl === null ? "" : dl < 0 ? "超期 " + Math.abs(dl) + " 天" : "剩 " + dl + " 天"}</span>
+              <div class="bar"><i class="${pcls}" style="width:${p.progress}%"></i></div>
+              <span>${p.progress}%</span>
+            </div>
+            <input type="range" min="0" max="100" step="5" value="${p.progress}" data-act="prog" style="width:100%;margin-top:10px;accent-color:var(--violet)" />
+            ${p.note ? '<div style="font-size:11px;color:var(--muted);margin-top:6px">' + esc(p.note) + '</div>' : ""}
+          </div>`;
+        }).join("")
+      : '<div class="empty">还没有项目。在下方输入「名称 + 阶段 + 节点日期」即可新建，节点会自动倒排。<br><span style="font-size:11px;color:#B3A7C7">建议先把在研的都加进来，哪怕进度先填个大概。</span></div>';
+  }
+
+  $("#projList").addEventListener("click", (e) => {
+    const step = e.target.closest("[data-stage]");
+    const card = e.target.closest(".proj");
+    if (!card) return;
+    const p = state.projects.find((x) => x.id === card.dataset.pid);
+    if (!p) return;
+    if (step) { p.stage = step.dataset.stage; save(); renderProj(); renderTodayProj(); return; }
+    const act = e.target.closest("[data-act=delProj]");
+    if (act) {
+      state.projects = state.projects.filter((x) => x.id !== p.id);
+      save(); renderProj(); renderTodayProj();
+    }
+  });
+  $("#projList").addEventListener("change", (e) => {
+    const inp = e.target.closest("[data-due]");
+    if (!inp) return;
+    const card = inp.closest(".proj");
+    const p = state.projects.find((x) => x.id === card.dataset.pid);
+    if (!p) return;
+    p.due = inp.value || "";
+    save(); renderProj(); renderTodayProj();
+    toast(p.due ? "节点已改为 " + p.due : "已清除节点日期");
+  });
+  $("#projList").addEventListener("input", (e) => {
+    const r = e.target.closest("[data-act=prog]");
+    if (!r) return;
+    const card = r.closest(".proj");
+    const p = state.projects.find((x) => x.id === card.dataset.pid);
+    if (!p) return;
+    p.progress = Number(r.value);
+    save(); renderProj(); renderTodayProj();
+  });
+  $("#addProj").addEventListener("click", () => {
+    const name = $("#projName").value.trim();
+    if (!name) { $("#projName").focus(); return; }
+    state.projects.push({
+      id: uid(), name,
+      stage: $("#projStage").value,
+      progress: 0,
+      due: $("#projDue").value || "",
+      risk: $("#projRisk").value,
+      note: ""
+    });
+    $("#projName").value = ""; $("#projDue").value = "";
+    save(); renderProj(); renderTodayProj();
+  });
+  $("#projName").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#addProj").click(); });
+
+  /* ---------------- 月度复盘 ---------------- */
+  function renderReview() {
+    const sel = $("#reviewMonth");
+    const cur = sel.value || M_KEY();
+    const now = today(), opts = [];
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      opts.push('<option value="' + M_KEY(d) + '">' + d.getFullYear() + " 年 " + (d.getMonth() + 1) + " 月</option>");
+    }
+    sel.innerHTML = opts.join("");
+    sel.value = opts.some((o) => o.indexOf('value="' + cur + '"') >= 0) ? cur : M_KEY();
+    const ym = sel.value;
+
+    const st = monthStats(ym);
+    $("#reviewStats").innerHTML = `
+      <div class="stat accent"><b>${st.rate}%</b><span>任务完成率（${st.done}/${st.total}）</span></div>
+      <div class="stat"><b>${st.days}</b><span>有记录工作日</span></div>
+      <div class="stat"><b>${st.wRate}%</b><span>周 KR 达成率（${st.wDone}/${st.wTotal}）</span></div>
+      <div class="stat"><b>${st.okr}%</b><span>月 OKR 平均进度</span></div>`;
+
+    const r = state.reviews[ym] || {};
+    $("#rvHigh").value = r.high || "";
+    $("#rvLow").value = r.low || "";
+    $("#rvAction").value = r.action || "";
+    $("#rvFocus").value = r.focus || "";
+
+    const rvOkr = okrList(ym);
+    $("#reviewOkr").innerHTML = rvOkr.length
+      ? rvOkr.map((o, i) => {
+          const p = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + krProgress(k), 0) / o.krs.length) : 0;
+          return `<div style="padding:11px 0;border-bottom:1px solid var(--line-soft)">
+            <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px">
+              <span class="obj-tag">O${i + 1}</span>
+              <span style="flex:1;font-size:12px;line-height:1.55;color:var(--ink-2)">${esc(o.title)}</span>
+              <span class="obj-prog">${p}%</span>
+            </div>
+            <div class="bar"><i class="${p >= 100 ? "hit" : p < 40 ? "low" : ""}" style="width:${p}%"></i></div>
+            ${o.krs.map((k) => {
+              const kp = krProgress(k);
+              return `<div style="display:flex;gap:8px;align-items:center;margin-top:7px;font-size:11px;color:var(--muted)">
+                <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(k.title)}</span>
+                <span class="chip ${kp >= 100 ? "ok" : kp < 40 ? "bad" : ""}">${kp}%</span>
+              </div>`;
+            }).join("")}
+          </div>`;
+        }).join("")
+      : '<div class="empty">该月还没有 OKR 记录</div>';
+
+    $("#reviewProj").innerHTML = state.projects.length
+      ? state.projects.map((p) => `<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--line-soft)">
+          <span class="chip">${esc(p.stage)}</span>
+          <span style="flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name)}</span>
+          <span style="font-size:11.5px;color:var(--violet-600);font-weight:600">${p.progress}%</span>
+          <span class="chip ${projRiskCls(p.risk)}">${esc(p.risk)}</span>
+        </div>`).join("")
+      : '<div class="empty" style="padding:16px">还没有项目</div>';
+
+    $("#c-review").textContent = (state.reviews[ym] && state.reviews[ym].high) ? "已写" : "待写";
+  }
+  $("#reviewMonth").addEventListener("change", renderReview);
+  $("#saveReview").addEventListener("click", () => {
+    const ym = $("#reviewMonth").value;
+    state.reviews[ym] = {
+      high: $("#rvHigh").value.trim(), low: $("#rvLow").value.trim(),
+      action: $("#rvAction").value.trim(), focus: $("#rvFocus").value.trim()
+    };
+    save(); toast(ym + " 的复盘已保存"); renderReview();
+  });
+
+  $("#exportMd").addEventListener("click", () => {
+    const ym = $("#reviewMonth").value, st = monthStats(ym), r = state.reviews[ym] || {};
+    let md = "# " + ym + " 研发工作复盘\n\n## 一、数据概览\n\n";
+    md += "- 任务完成率：" + st.rate + "%（" + st.done + "/" + st.total + "）\n";
+    md += "- 有记录工作日：" + st.days + " 天，累计投入 " + st.hours.toFixed(1) + " 小时\n";
+    md += "- 周 KR 达成率：" + st.wRate + "%（" + st.wDone + "/" + st.wTotal + "）\n";
+    md += "- 月 OKR 平均进度：" + st.okr + "%\n\n## 二、月度 OKR\n\n";
+    okrList(ym).forEach((o, i) => {
+      const p = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + krProgress(k), 0) / o.krs.length) : 0;
+      md += "**O" + (i + 1) + "：" + o.title + "** — " + p + "%\n\n";
+      o.krs.forEach((k) => {
+        md += "- " + k.title + "（" + k.current + "/" + (k.dir === "down" ? "≤" : "") + k.target + k.unit + "，进度 " + krProgress(k) + "%）\n";
+      });
+      md += "\n";
+    });
+    md += "## 三、样机进展\n\n";
+    state.projects.forEach((p) => {
+      md += "- **" + p.name + "**：" + p.stage + " 阶段，" + p.progress + "%，节点 " + (p.due || "未设") + "，风险 " + p.risk + (p.note ? "（" + p.note + "）" : "") + "\n";
+    });
+    md += "\n## 四、做对了什么\n\n" + (r.high || "（待补充）") + "\n\n";
+    md += "## 五、问题与根因\n\n" + (r.low || "（待补充）") + "\n\n";
+    md += "## 六、下月改进动作\n\n" + (r.action || "（待补充）") + "\n\n";
+    md += "## 七、下月聚焦\n\n" + (r.focus || "（待补充）") + "\n";
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = ym + "-研发复盘.md";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    toast("已导出 Markdown");
+  });
+
+  /* ---------------- 历史回顾 ---------------- */
+  function shortD(k) { const a = k.split("-"); return Number(a[1]) + "/" + Number(a[2]); }
+
+  function renderHistory() {
+    const parts = historyMonth.split("-").map(Number);
+    const y = parts[0], m = parts[1];
+    $("#historyLabel").textContent = y + " 年 " + m + " 月";
+
+    const startWd = (new Date(y, m - 1, 1).getDay() + 6) % 7;
+    const dim = new Date(y, m, 0).getDate();
+    let cells = ["一", "二", "三", "四", "五", "六", "日"].map((w) => '<div class="wd">' + w + '</div>').join("");
+    for (let i = 0; i < startWd; i++) cells += '<div class="blank"></div>';
+    for (let d = 1; d <= dim; d++) {
+      const key = y + "-" + pad2(m) + "-" + pad2(d);
+      const has = Array.isArray(state.days[key]) && state.days[key].length > 0;
+      const st = has ? dayStats(key) : null;
+      const alpha = has ? 0.08 + (st.rate / 100) * 0.42 : 0;
+      const bg = has ? "background:rgba(124,58,237," + alpha.toFixed(2) + ");" : "";
+      cells += '<button class="cell ' + (has ? "has" : "") + (key === T_KEY() ? " today" : "") + '" ' +
+        'data-day="' + key + '" style="' + bg + '" title="' + key + '">' +
+        "<b>" + d + "</b>" + (has ? '<i><em style="width:' + st.rate + '%"></em></i>' : "") + "</button>";
+    }
+    $("#calGrid").innerHTML = cells;
+
+    const st = monthStats(historyMonth);
+    let best = null, worst = null;
+    Object.keys(state.days).filter((k) => k.indexOf(historyMonth) === 0).forEach((k) => {
+      const s = dayStats(k);
+      if (!s.total) return;
+      if (!best || s.rate > best.rate) best = { k: k, rate: s.rate };
+      if (!worst || s.rate < worst.rate) worst = { k: k, rate: s.rate };
+    });
+    $("#historyStats").innerHTML = `
+      <div class="stat accent"><b>${st.rate}%</b><span>当月完成率</span></div>
+      <div class="stat"><b>${st.days}</b><span>有记录天数 · ${st.hours.toFixed(0)}h</span></div>
+      <div class="stat"><b>${best ? best.rate + "%" : "—"}</b><span>最好一天 ${best ? shortD(best.k) : ""}</span></div>
+      <div class="stat"><b>${worst ? worst.rate + "%" : "—"}</b><span>最差一天 ${worst ? shortD(worst.k) : ""}</span></div>`;
+    $("#c-history").textContent = st.days || "—";
+
+    const keys = Object.keys(state.days)
+      .filter((k) => k.indexOf(historyMonth) === 0 && (state.days[k] || []).length)
+      .sort().reverse();
+    $("#historyList").innerHTML = keys.length
+      ? keys.map((k) => {
+          const s = dayStats(k);
+          const d = new Date(k + "T00:00:00");
+          return `<div class="his" data-day="${k}">
+            <div class="his-date">${d.getDate()} 日<span>${WD[d.getDay()].replace("星期", "周")}</span></div>
+            <div class="bar"><i class="${s.rate >= 100 ? "hit" : s.rate < 50 ? "low" : ""}" style="width:${s.rate}%"></i></div>
+            <div class="his-num">${s.done}/${s.total} · ${s.hours}h</div>
+            <span class="chip ${s.rate >= 100 ? "ok" : s.rate < 50 ? "bad" : ""}">${s.rate}%</span>
+          </div>`;
+        }).join("")
+      : '<div class="empty">这个月还没有任何工作记录</div>';
+  }
+
+  function gotoHistoryMonth(ym) { historyMonth = ym; renderHistory(); }
+  $("#prevHm").addEventListener("click", () => gotoHistoryMonth(shiftMonth(historyMonth, -1)));
+  $("#nextHm").addEventListener("click", () => gotoHistoryMonth(shiftMonth(historyMonth, 1)));
+  $("#calGrid").addEventListener("click", (e) => {
+    const c = e.target.closest("[data-day]");
+    if (!c) return;
+    viewDay = c.dataset.day;
+    setView("today");
+    toast("已切到 " + shortD(c.dataset.day));
+  });
+  $("#historyList").addEventListener("click", (e) => {
+    const row = e.target.closest("[data-day]");
+    if (!row) return;
+    viewDay = row.dataset.day;
+    setView("today");
+  });
+
+  /* ---------------- 视图切换 ---------------- */
+  const TITLES = {
+    today: ["把今天的<em>验证</em>跑完"],
+    standup: ["昨天的<em>结论</em>是什么"],
+    week: ["这周要有<em>可验收</em>的产出"],
+    month: ["方向对了，<em>指标跟上</em>"],
+    proj: ["先定<em>交付节点</em>，再往下拆"],
+    history: ["回头看，<em>进度是真是假</em>"],
+    review: ["月底了，<em>把账算清</em>"]
+  };
+  function setView(name) {
+    $$(".view").forEach((v) => v.classList.toggle("is-active", v.id === "view-" + name));
+    $$("[data-view]").forEach((b) => b.classList.toggle("is-active", b.dataset.view === name));
+    $("#pageTitle").innerHTML = (TITLES[name] || [""])[0];
+    if (name === "today") { renderToday(); renderCarry(); renderTodayProj(); }
+    if (name === "standup") renderStandup();
+    if (name === "week") { fillLinkSelects(); renderWeek(); }
+    if (name === "month") renderMonth();
+    if (name === "proj") renderProj();
+    if (name === "history") renderHistory();
+    if (name === "review") renderReview();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  $$("[data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
+  $$("[data-jump]").forEach((el) => el.addEventListener("click", () => setView(el.dataset.jump)));
+
+  function boot() {
+    renderAll();
+  }
+
+  function renderAll() {
+    renderHead(); renderToday(); renderCarry(); renderTodayProj();
+    renderStandup(); renderWeek(); renderMonth(); renderProj(); renderHistory(); renderReview();
+    renderMiniOkr(); fillLinkSelects();
+    updateStandupBadge(); renderStoreInfo();
+  }
+
+  /* ---------------- 数据管理 ---------------- */
+  $("#clearAll").addEventListener("click", () => {
+    const ok = confirm(
+      "将从零开始：\n\n" +
+      "· 清空全部每日任务与晨会记录\n" +
+      "· 清空所有项目 Objective 与关键结果\n" +
+      "· 清空周 KR、样机项目、复盘文字\n\n" +
+      "此操作不可撤销。建议先点「导出备份 JSON」存一份。\n\n确定清空吗？"
+    );
+    if (!ok) return;
+    state = { okrByMonth: {}, projects: [], weeks: {}, days: {}, standups: {}, reviews: {} };
+    viewDay = T_KEY(); viewStandupDay = Y_KEY(); viewMonth = M_KEY(); historyMonth = M_KEY(); viewWeekKey = W_KEY();
+    save(); renderAll();
+    toast("已清空，现在是空白工作台");
+  });
+
+  $("#restoreSample").addEventListener("click", () => {
+    if (!confirm("将用示例数据覆盖当前全部内容（含你已录入的数据），确定吗？")) return;
+    state = buildDefaults();
+    save(); renderAll();
+    toast("已恢复示例数据");
+  });
+
+  $("#backupJson").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "workbench-backup-" + T_KEY() + ".json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    toast("备份已导出");
+  });
+
+  $("#importJson").addEventListener("click", () => $("#importFile").click());
+  $("#importFile").addEventListener("change", (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(String(reader.result));
+        if (!data || typeof data !== "object") throw new Error("不是有效的 JSON");
+        const keys = ["okrByMonth", "objectives", "projects", "weeks", "days", "standups", "reviews"];
+        if (!keys.some((k) => data[k] !== undefined)) throw new Error("不像是工作台备份文件");
+        if (!confirm("将用备份文件覆盖当前全部数据，确定吗？")) { e.target.value = ""; return; }
+        let okr = data.okrByMonth;
+        if (!okr && Array.isArray(data.objectives)) { okr = {}; okr[M_KEY()] = data.objectives; }
+        state = {
+          okrByMonth: okr && typeof okr === "object" ? okr : {},
+          projects: Array.isArray(data.projects) ? data.projects : [],
+          weeks: data.weeks && typeof data.weeks === "object" ? data.weeks : {},
+          days: data.days && typeof data.days === "object" ? data.days : {},
+          standups: data.standups && typeof data.standups === "object" ? data.standups : {},
+          reviews: data.reviews && typeof data.reviews === "object" ? data.reviews : {}
+        };
+        viewDay = T_KEY(); viewStandupDay = Y_KEY(); viewMonth = M_KEY(); historyMonth = M_KEY(); viewWeekKey = W_KEY();
+        save(); renderAll();
+        toast("备份已导入");
+      } catch (err) {
+        toast("导入失败：" + (err && err.message ? err.message : "文件读取错误"));
+      }
+      e.target.value = "";
+    };
+    reader.readAsText(f, "utf-8");
+  });
+
+  function renderStoreInfo() {
+    let bytes = 0;
+    try { bytes = (localStorage.getItem(KEY) || "").length; } catch (err) { bytes = 0; }
+    const size = bytes ? (bytes / 1024).toFixed(1) + " KB" : "暂无数据";
+    const el = $("#storeInfo");
+    if (!el) return;
+    el.textContent = "浏览器本地存储 · " + size;
+    const origin = location.protocol === "file:" ? "本地文件（file://）" : location.origin;
+    el.title = "存储位置：" + origin + "\n存储键名：" + KEY +
+      "\n\n数据不进这个 HTML 文件，换浏览器 / 清缓存 / 换打开方式都会看不到。\n建议定期点「导出备份 JSON」。";
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
